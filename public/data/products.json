@@ -1,0 +1,790 @@
+[
+  {
+    "id": "empanada-carne-suave-1",
+    "name": "Carne suave",
+    "precio": 1800,
+    "descripcion": "Carne picada, cebolla, huevo y condimentos suaves.",
+    "imagen": "img/empanada-carne-suave.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-carne-picante-2",
+    "name": "Carne picante",
+    "precio": 1800,
+    "descripcion": "Carne picada, cebolla, ají molido y picante especial.",
+    "imagen": "img/empanada-carne-picante.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-pollo-3",
+    "name": "Pollo",
+    "precio": 1800,
+    "descripcion": "Pollo desmenuzado, cebolla, morrón y condimentos.",
+    "imagen": "img/empanada-pollo.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-pollo-verdeo-4",
+    "name": "Pollo al verdeo",
+    "precio": 1800,
+    "descripcion": "Pollo, cebolla de verdeo, salsa blanca y especias.",
+    "imagen": "img/empanada-pollo-verdeo.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-jamon-queso-5",
+    "name": "Jamón y queso",
+    "precio": 1800,
+    "descripcion": "Jamón cocido y muzzarella.",
+    "imagen": "img/empanada-jamon-queso.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-queso-cebolla-6",
+    "name": "Queso y cebolla",
+    "precio": 1800,
+    "descripcion": "Muzzarella, cebolla salteada y orégano.",
+    "imagen": "img/empanada-queso-cebolla.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-capresse-7",
+    "name": "Capresse",
+    "precio": 1800,
+    "descripcion": "Muzzarella, tomate y albahaca.",
+    "imagen": "img/empanada-capresse.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-roquefort-8",
+    "name": "Roquefort",
+    "precio": 1800,
+    "descripcion": "Queso roquefort y muzzarella.",
+    "imagen": "img/empanada-roquefort.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-humita-9",
+    "name": "Humita",
+    "precio": 1800,
+    "descripcion": "Choclo, salsa blanca, muzzarella y especias.",
+    "imagen": "img/empanada-humita.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-verdura-10",
+    "name": "Verdura",
+    "precio": 1800,
+    "descripcion": "Acelga, salsa blanca, muzzarella y condimentos.",
+    "imagen": "img/empanada-verdura.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-atun-11",
+    "name": "Atún",
+    "precio": 1800,
+    "descripcion": "Atún, cebolla, morrón y especias.",
+    "imagen": "img/empanada-atun.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-calabaza-12",
+    "name": "Calabaza",
+    "precio": 1800,
+    "descripcion": "Puré de calabaza, muzzarella y cebolla.",
+    "imagen": "img/empanada-calabaza.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-champiñones-13",
+    "name": "Champiñones",
+    "precio": 1800,
+    "descripcion": "Champiñones, muzzarella y cebolla.",
+    "imagen": "img/empanada-champignon.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-napolitana-14",
+    "name": "Napolitana",
+    "precio": 1800,
+    "descripcion": "Jamón, tomate, muzzarella y orégano.",
+    "imagen": "img/empanada-napolitana.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-choclo-15",
+    "name": "Choclo",
+    "precio": 1800,
+    "descripcion": "Choclo, queso crema, muzzarella y condimentos.",
+    "imagen": "img/empanada-choclo.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-carne-cuchillo-16",
+    "name": "Carne cortada a cuchillo",
+    "precio": 1800,
+    "descripcion": "Carne cortada a cuchillo, cebolla, huevo y condimentos.",
+    "imagen": "img/empanada-cuchillo.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-bondiola-bbq-17",
+    "name": "Bondiola BBQ",
+    "precio": 1800,
+    "descripcion": "Bondiola de cerdo desmenuzada, barbacoa y queso.",
+    "imagen": "img/empanada-bondiola.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-carne-queso-18",
+    "name": "Carne y queso",
+    "precio": 1800,
+    "descripcion": "Carne picada, muzzarella y especias.",
+    "imagen": "img/empanada-carne-queso.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-4-quesos-19",
+    "name": "4 quesos",
+    "precio": 1800,
+    "descripcion": "Muzzarella, roquefort, provolone y parmesano.",
+    "imagen": "img/empanada-4quesos.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-tocino-cheddar-20",
+    "name": "Tocino y cheddar",
+    "precio": 1800,
+    "descripcion": "Panceta ahumada y cheddar fundido.",
+    "imagen": "img/empanada-cheddar.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-muzzarella-tomate-21",
+    "name": "Muzzarella y tomate",
+    "precio": 1800,
+    "descripcion": "Rodajas de tomate y muzzarella derretida.",
+    "imagen": "img/empanada-muzza-tomate.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-espinaca-22",
+    "name": "Espinaca",
+    "precio": 1800,
+    "descripcion": "Espinaca salteada, salsa blanca, muzzarella.",
+    "imagen": "img/empanada-espinaca.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-muzzarella-sola-23",
+    "name": "Muzzarella sola",
+    "precio": 1800,
+    "descripcion": "Solo muzzarella fundida.",
+    "imagen": "img/empanada-muzza.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-jamon-crudo-rucula-24",
+    "name": "Jamón crudo y rúcula",
+    "precio": 1800,
+    "descripcion": "Jamón crudo, rúcula fresca y parmesano.",
+    "imagen": "img/empanada-rucula.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-jamon-queso-huevo-25",
+    "name": "Jamón, queso y huevo",
+    "precio": 1800,
+    "descripcion": "Jamón cocido, muzzarella y huevo duro.",
+    "imagen": "img/empanada-jamon-huevo.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-provolone-cebolla-26",
+    "name": "Provolone y cebolla",
+    "precio": 1800,
+    "descripcion": "Queso provolone, cebolla y orégano.",
+    "imagen": "img/empanada-provolone.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "empanada-morron-huevo-27",
+    "name": "Morrón y huevo",
+    "precio": 1800,
+    "descripcion": "Morrones asados y huevo duro picado.",
+    "imagen": "img/empanada-morron-huevo.webp",
+    "category": "Empanadas"
+  },
+  {
+    "id": "pizza-americana-28",
+    "name": "Americana",
+    "precio": 17100,
+    "descripcion": "Salsa de tomate, jamon, huevo frito, muzzarella, morron, oregano y aceitunas verdes.",
+    "imagen": "img/pizza-americana.jpeg",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-muzzarella-29",
+    "name": "Muzzarella",
+    "precio": 9700,
+    "descripcion": "Salsa de tomate, muzzarella, oregano y aceitunas verdes.",
+    "imagen": "img/pizza-muzzarella.jfif",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-anchoas-30",
+    "name": "Anchoas",
+    "precio": 10800,
+    "descripcion": "Salsa de tomate, filet de anchoa, morron, oregano y aceitunas verdes.",
+    "imagen": "img/pizza-anchoas.jfif",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-roma-31",
+    "name": "Roma",
+    "precio": 14500,
+    "descripcion": "Salsa de tomate, filet de anchoa, muzzarella, morron, oregano y aceitunas verdes.",
+    "imagen": "img/pizza-roma.jfif",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-ajo-oleo-32",
+    "name": "Ajo al Oleo",
+    "precio": 8500,
+    "descripcion": "Salsa de tomate, ajo, aji molido y oregano.",
+    "imagen": "img/pizza-ajo-oleo.webp",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-cancha-33",
+    "name": "Cancha",
+    "precio": 8800,
+    "descripcion": "Salsa de tomate, cebolla de verdeo, morrones, ajo, aji molido y oregano.",
+    "imagen": "img/pizza-cancha.jpeg",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-fugazza-34",
+    "name": "fugazza",
+    "precio": 9900,
+    "descripcion": "cebolla, oliva y oregano.",
+    "imagen": "img/pizza-fugazza.jfif",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-fugazza-queso-35",
+    "name": "Fugazza con queso",
+    "precio": 13500,
+    "descripcion": "Cebolla, aceite de oliva y oregano.",
+    "imagen": "img/pizza-fugazza-queso.jpeg",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-jamon-36",
+    "name": "Jamon",
+    "precio": 13600,
+    "descripcion": "Salsa de tomate,jamon, muzzarella y aceitunas verdes.",
+    "imagen": "img/pizza-jamon.webp",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-jamon-morrones-37",
+    "name": "Jamon y morrones",
+    "precio": 14800,
+    "descripcion": "Salsa de tomate, jamon, morrones, muzzarella, oregano y aceitunas verdes.",
+    "imagen": "img/pizza-especial.webp",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-napolitana-38",
+    "name": "Napolitana",
+    "precio": 15500,
+    "descripcion": "salsa de tomates, muzzarella, rodajas de tomates, albahaca, ajo y oregano.",
+    "imagen": "img/pizza-napolitana.webp",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-napolitana-especial-39",
+    "name": "Napolitana Especial",
+    "precio": 16900,
+    "descripcion": "Salsa de tomate, muzzarella, rodajas de tomates, albahaca, ajo, oregano y jamon.",
+    "imagen": "img/pizza-napolitana-especial.jpeg",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-calabresa-40",
+    "name": "Calabresa",
+    "precio": 13600,
+    "descripcion": "Salsa de tomate, muzzarella, longaniza, morrones, oregano y aceitunas verdes.",
+    "imagen": "img/pizza-calabresa.webp",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-roquefort-41",
+    "name": "Roquefort",
+    "precio": 13500,
+    "descripcion": "Salsa de tomate, muzzarella, roquefort, oregano y aceitunas verdes.",
+    "imagen": "img/pizza-roquefort.webp",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-provolone-42",
+    "name": "Provolone",
+    "precio": 14700,
+    "descripcion": "Salsa de tomate, muzzarella, jamon, provolone, pimienta, orégano y aceitunas verdes.",
+    "imagen": "img/pizza-provolone.webp",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-palmitos-43",
+    "name": "Palmitos",
+    "precio": 18000,
+    "descripcion": "Salsa de tomate, muzzarella, jamon, palmitos, morron, huevo duro, salsa golf, oregano y aceitunas verdes.",
+    "imagen": "img/pizza-palmitos.webp",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-rucula-jamon-crudo-44",
+    "name": "Rucula y Jamón Crudo",
+    "precio": 17600,
+    "descripcion": "Jamon crudo, muzzarella, rucula, parmesano y tomates cherry.",
+    "imagen": "img/pizza-rucula.jfif",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-verduras-45",
+    "name": "Verduras",
+    "precio": 11500,
+    "descripcion": "Salsa de tomate, salsa blanca, acelga, provolone rayado, oregano y aceitunas verdes.",
+    "imagen": "img/pizza-verdura.webp",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-mila-46",
+    "name": "Mila pizza",
+    "precio": 22800,
+    "descripcion": "Jamon, muzzarella, tomate, huevo duro y milanesa.",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-estilo-americano-47",
+    "name": "Estilo americano",
+    "precio": 15000,
+    "descripcion": "Barbacoa, panceta, pimientos rojos, muzzarella.",
+    "imagen": "img/pizza-estilo-americano.jpeg",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-hawaiana-48",
+    "name": "Hawaiana",
+    "precio": 17500,
+    "descripcion": "Salsa de tomate, jamon, muzzarella, anana, cerezas, azucar negra, aceitunas verdes.",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-fugazzeta-rellena-49",
+    "name": "Fugazzeta rellena",
+    "precio": 19500,
+    "descripcion": "Muzzarella y jamon.",
+    "imagen": "img/pizza-fugazzeta-rellena.jfif",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-fugazzeta-completa-50",
+    "name": "Fugazzeta completa",
+    "precio": 21800,
+    "descripcion": "Muzzarella, jamon, tomate y huevo.",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-champignon-51",
+    "name": "Champignon",
+    "precio": 11600,
+    "descripcion": "Salsa de tomate, muzzarella, champignones, queso rallado, oregano y aceitunas verdes.",
+    "imagen": "img/pizza-champignons.webp",
+    "category": "Pizzas"
+  },
+  {
+    "id": "calzone-napoles-52",
+    "name": "Calzone napoles",
+    "precio": 12200,
+    "descripcion": "Muzzarella, rodajas de tomate, jamon, albahaca y ajo.",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "calzone-calabres-53",
+    "name": "Calzone calabres",
+    "precio": 13500,
+    "descripcion": "Muzzarella, longaniza, rodajas de tomate y jamon",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "calzone-roquefort-54",
+    "name": "Calzone al roquefort",
+    "precio": 14600,
+    "descripcion": "Muzzarella, roquefort, morron y jamon.",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "calzone-primavera-55",
+    "name": "Calzone primavera",
+    "precio": 14500,
+    "descripcion": "Muzzarella, rodajas de tomate, jamon, huevo duro y oregano.",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-capriccio-56",
+    "name": "Capriccio",
+    "precio": 15600,
+    "descripcion": "Salsa de tomates, muzarella, rodajas de tomate, jamon, morron, huevo duro, oregano y aceitunas verdes.",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-muzzarella-huevo-57",
+    "name": "Muzzarella al huevo",
+    "precio": 12800,
+    "descripcion": "Salsa de tomate, huevo duro, oregano y aceitunas verdes.",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-jamon-huevo-58",
+    "name": "Jamon al huevo",
+    "precio": 14500,
+    "descripcion": "Salsa de tomate, muzzarella, jamon, huevo duro, oregano y aceitunas verdes.",
+    "imagen": "img/pizza-jamon-huevo.webp",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-vienesa-59",
+    "name": "Vienesa",
+    "precio": 15100,
+    "descripcion": "Salsa de tomate, muzzarella, salchicha, mostaza, oregano y aceitunas verdes.",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-primavera-60",
+    "name": "Primavera",
+    "precio": 14000,
+    "descripcion": "Salsa de tomate, muzzarella, jamon, rodajas de tomate y huevo duro.",
+    "imagen": "img/primavera.webp",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-cuatro-quesos-61",
+    "name": "Cuatro Quesos",
+    "precio": 14600,
+    "descripcion": "Salsa de tomate, muzzarella, provolone, gruyere, roquefort, oregano y aceitunas verdes.",
+    "imagen": "img/pizza-4quesos.webp",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-choclo-62",
+    "name": "Choclo",
+    "precio": 12000,
+    "descripcion": "Salsa de tomate, muzzarella, choclo, salsa blanca y aceitunas verdes.",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-criolla-63",
+    "name": "Criolla",
+    "precio": 750,
+    "descripcion": "Cebolla, tomate, morron, muzzarella, queso rayado y aceitunas verdes.",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-cheddar-64",
+    "name": "Cheddar",
+    "precio": 16500,
+    "descripcion": "Muzzarella, panceta, cheddar, morron, oregano y aceitunas verdes.",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-pollo-barbacoa-65",
+    "name": "Pollo a la barbacoa",
+    "precio": 18600,
+    "descripcion": "pollo, barbacoa, tomate, morron, muzzarella y queso rayado,.",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "pizza-hambur-66",
+    "name": "Hambur Pizza",
+    "precio": 23000,
+    "descripcion": "Hamburguesa, panceta, cheddar y muzzarella.",
+    "imagen": "img/default-product.png",
+    "category": "Pizzas"
+  },
+  {
+    "id": "canelones-verdura-salsa-67",
+    "name": "Canelones de verdura con salsa",
+    "descripcion": "Canelones de verdura con salsa blanca.",
+    "imagen": "img/canelon-verdura-salsa.jfif",
+    "precio": 10200,
+    "category": "Platos Especiales"
+  },
+  {
+    "id": "canelones-carne-salsa-68",
+    "name": "Canelones de carne con salsa",
+    "descripcion": "Canelones de carne con salsa blanca.",
+    "precio": 11000,
+    "imagen": "img/canelon-carne-salsa.jfif",
+    "category": "Platos Especiales"
+  },
+  {
+    "id": "sorrentinos-salsa-69",
+    "name": "Sorrentinos con salsa",
+    "precio": 11000,
+    "imagen": "img/sorrentinos-salsa.jfif",
+    "category": "Platos Especiales"
+  },
+  {
+    "id": "pastel-papas-70",
+    "name": "Pastel de papas",
+    "precio": 9500,
+    "imagen": "img/pastel-papa-carne.jfif",
+    "category": "Platos Especiales"
+  },
+  {
+    "id": "polenta-bolognesa-71",
+    "name": "polenta con bolognesa",
+    "precio": 5700,
+    "imagen": "img/polenta-bolognesa.jfif",
+    "category": "Platos Especiales"
+  },
+  {
+    "id": "pollo-verdeo-champignon-papas-72",
+    "name": "pollo al verdeo o al champignon con papas españolas",
+    "precio": 9700,
+    "imagen": "img/pollo-al-verdeo-papas-españolas.jfif",
+    "category": "Platos Especiales"
+  },
+  {
+    "id": "bandeja-super-capriccio-73",
+    "name": "Bandeja super capriccio",
+    "descripcion": "panceta, cheddar y verdeo",
+    "imagen": "img/bandeja-papas-capriccio.jfif",
+    "category": "Platos Especiales"
+  },
+  {
+    "id": "bandeja-papas-fritas-74",
+    "name": "bandeja de papas fritas",
+    "precio": 8500,
+    "imagen": "img/bandeja-papas.jfif",
+    "category": "Platos Especiales"
+  },
+  {
+    "id": "tortilla-papas-75",
+    "name": "Tortilla de papas",
+    "precio": 9500,
+    "imagen": "img/tortilla-papas.jfif",
+    "category": "Platos Especiales"
+  },
+  {
+    "id": "papas-capriccio-76",
+    "name": "Papas Capriccio",
+    "descripcion": "Panceta y cheddar",
+    "precio": 9300,
+    "imagen": "img/papas-panceta-cheddar.jfif",
+    "category": "Platos Especiales"
+  },
+  {
+    "id": "milanesa-capriccio-77",
+    "name": "milanesa capriccio",
+    "descripcion": "panceta y cheddar con papas fritas",
+    "precio": 11900,
+    "imagen": "img/milanesa-panceta-cheddar-papas.jfif",
+    "category": "Platos Especiales"
+  },
+  {
+    "id": "milanesa-napolitana-papas-78",
+    "name": "Milanesa napolita con papas fritas o al horno",
+    "precio": 11000,
+    "imagen": "img/milanesa-napolitana-fritas.jfif",
+    "category": "Platos Especiales"
+  },
+  {
+    "id": "sandwich-milanesa-79",
+    "name": "sandwich de milanesa",
+    "descripcion": "pollo o carne con lechuga y tomate",
+    "precio": 7300,
+    "imagen": "img/sandwich-milanesa-lechuga-tomate.jfif",
+    "category": "Platos Especiales"
+  },
+  {
+    "id": "sandwich-especial-80",
+    "name": "sandwich especial",
+    "descripcion": "jamon, queso, lechuga y tomate(pollo o carne)",
+    "precio": 9200,
+    "imagen": "img/sandwich-milanesa-jamon-huevo-lechuga-tomate.jfif",
+    "category": "Platos Especiales"
+  },
+  {
+    "id": "sandwich-simple-81",
+    "name": "sandwich simple",
+    "descripcion": "",
+    "precio": 6500,
+    "imagen": "img/sandwich-churrasquito-jamon-queso.jfif",
+    "category": "Churrasquitos"
+  },
+  {
+    "id": "churrasquito-lechuga-tomate-82",
+    "name": "lechuga y tomate",
+    "descripcion": "pollo o carne con lechuga y tomate",
+    "precio": 7700,
+    "imagen": "img/sandwich-churrasquito-jamon-queso.jfif",
+    "category": "Churrasquitos"
+  },
+  {
+    "id": "churrasquito-completo-83",
+    "name": "completo",
+    "descripcion": "jamon, queso,huevo, lechuga y tomate",
+    "precio": 8800,
+    "imagen": "img/sandwich-churrasquito-jamon-queso.jfif",
+    "category": "Churrasquitos"
+  },
+  {
+    "id": "churrasquito-doble-completo-84",
+    "name": "doble completo",
+    "descripcion": "doble carne,jamon, queso, huevo, lechuga y tomate",
+    "imagen": "img/sandwich-churrasquito-jamon-queso.jfif",
+    "category": "Churrasquitos"
+  },
+  {
+    "id": "hamburguesa-simple-85",
+    "name": "Hamburguesa simple",
+    "precio": 3900,
+    "imagen": "img/hamburguesa-simple.jfif",
+    "category": "Hamburguesas"
+  },
+  {
+    "id": "hamburguesa-jamon-queso-86",
+    "name": "Hamburguesa jamon y queso",
+    "precio": 5900,
+    "imagen": "img/hamburguesa-jyq.jfif",
+    "category": "Hamburguesas"
+  },
+  {
+    "id": "hamburguesa-completa-87",
+    "name": "Hamburguesa jamon, queso, huevo,lechuga y tomate",
+    "precio": 8000,
+    "imagen": "img/hamburguesa-jyq-lechuga-tomate-huevo.jfif",
+    "category": "Hamburguesas"
+  },
+  {
+    "id": "hamburguesa-doble-88",
+    "name": "Hamburguesa doble",
+    "precio": 8400,
+    "descripcion": "jamon, queso, huevo, tomate",
+    "imagen": "img/hamburguesa-doble.jpeg",
+    "category": "Hamburguesas"
+  },
+  {
+    "id": "hamburguesa-capriccio-89",
+    "name": "capriccio",
+    "precio": 9200,
+    "descripcion": "doble carne, panceta, cheddar, cebolla caramelizada y barbacoa",
+    "imagen": "img/hamburguesa-doble-panceta-cebolla.jfif",
+    "category": "Hamburguesas"
+  },
+  {
+    "id": "promo-1-90",
+    "name": "Promo 1",
+    "descripcion": "1 muzzarella + fugazza con queso + jamon y morrones.",
+    "precio": 36000,
+    "imagen": "img/default-product.png",
+    "category": "Promos"
+  },
+  {
+    "id": "promo-2-91",
+    "name": "Promo 2",
+    "descripcion": "3 Pizza de muzzarella.",
+    "precio": 28000,
+    "imagen": "img/default-product.png",
+    "category": "Promos"
+  },
+  {
+    "id": "promo-3-92",
+    "name": "Promo 3",
+    "descripcion": "1 muzzarella + jamon + 6 empanadas.",
+    "precio": 33000,
+    "imagen": "img/default-product.png",
+    "category": "Promos"
+  },
+  {
+    "id": "combo-1-93",
+    "name": "Combo 1",
+    "descripcion": "hamburguesa doble completa con fritas.",
+    "precio": 10700,
+    "imagen": "img/default-product.png",
+    "category": "Combos"
+  },
+  {
+    "id": "combo-2-94",
+    "name": "Combo 2",
+    "descripcion": "hamburguesa doble capriccio con fritas.",
+    "precio": 12500,
+    "imagen": "img/default-product.png",
+    "category": "Combos"
+  },
+  {
+    "id": "combo-3-95",
+    "name": "Combo 3",
+    "descripcion": "hamburguesa doble, jamon y queso con fritas.",
+    "precio": 11000,
+    "imagen": "img/default-product.png",
+    "category": "Combos"
+  },
+  {
+    "id": "combo-4-96",
+    "name": "Combo 4",
+    "descripcion": "hamburguesa doble cheddar con fritas.",
+    "precio": 12000,
+    "imagen": "img/default-product.png",
+    "category": "Combos"
+  },
+  {
+    "id": "tarta-jamon-queso-97",
+    "name": "Tarta de Jamon y queso",
+    "descripcion": "Deliciosa tarta de jamon y queso.",
+    "precio": 5000,
+    "imagen": "img/tarta-jamon-queso.jfif",
+    "category": "Tartas"
+  },
+  {
+    "id": "tarta-zapallito-queso-98",
+    "name": "Tarta de zapallito y queso",
+    "descripcion": "Fresca tarta de zapallo y queso de temporada.",
+    "precio": 9100,
+    "imagen": "img/default-product.png",
+    "category": "Tartas"
+  },
+  {
+    "id": "tarta-acelga-queso-99",
+    "name": "Tarta de acelga y queso",
+    "descripcion": "Clásica tarta de acelga y queso.",
+    "precio": 9100,
+    "imagen": "img/default-product.png",
+    "category": "Tartas"
+  },
+  {
+    "id": "tarta-jamon-queso-tomate-huevo-100",
+    "name": "Tarta de Jamon, queso, tomate y huevo",
+    "descripcion": "sabrosa.",
+    "precio": 9100,
+    "imagen": "img/default-product.png",
+    "category": "Tartas"
+  }
+]

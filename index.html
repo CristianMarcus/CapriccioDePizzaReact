@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es" class="light"> <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/jpeg" href="/logo-capriccio2.jpeg" /> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capriccio de Pizza</title>
+    
+    <style>
+      /* * ESTILOS PARA EL BODY EN MODO CLARO Y OSCURO */
+      body {
+        background-color: #f5ba8a; /* Un color crema muy claro para el modo claro */
+        color: #1f2937;            /* text-gray-900 para el modo claro */
+        font-family: 'Poppins', sans-serif;
+      }
+
+      /* Este estilo se aplica cuando la clase 'dark' está en el elemento html */
+      html.dark body {
+        background-color: #1a202c; /* Gris oscuro para el modo oscuro (gray-900 de Tailwind) */
+        color: #e2e8f0;            /* text-gray-200 para texto en modo oscuro */
+      }
+    </style>
+
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
