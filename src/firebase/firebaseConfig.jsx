@@ -1,32 +1,22 @@
-// firebaseConfig.js
-// Import the functions you need from the SDKs you need
+// firebase.config.js
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore"; // Importa Firestore
-import { getStorage } from "firebase/storage";   // Importa Storage
-// import { getAnalytics } from "firebase/analytics"; // Analytics no es necesario para esta funcionalidad
+import { getFirestore } from "firebase/firestore"; 
+import { getStorage } from "firebase/storage";
 
-// Your web app's Firebase configuration
+// Configuración de Firebase usando variables de entorno VITE_
 const firebaseConfig = {
-  apiKey: "AIzaSyDi_Ib60RvM2IWjjLtF0iVTaNe2MlvbNlI",
-  authDomain: "capiccio-de-pizza.firebaseapp.com",
-  projectId: "capiccio-de-pizza",
-  storageBucket: "capiccio-de-pizza.firebasestorage.app",
-  messagingSenderId: "179467906709",
-  appId: "1:179467906709:web:64cf03a00c59860e15b59c",
-  measurementId: "G-B99Y49FPPS" // Puedes mantenerlo si lo usas, pero no es crucial para Firestore/Storage
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Inicializa Firestore
 const db = getFirestore(app);
-
-// Inicializa Storage
 const storage = getStorage(app);
 
-// Si usas Analytics, puedes mantener esta línea:
-// const analytics = getAnalytics(app);
-
-// Exporta las instancias para usarlas en otros componentes
 export { app, db, storage };
+export default app;
