@@ -3,48 +3,53 @@ import { ShoppingCart, ImageOff, Plus, Minus, Heart, Star } from 'lucide-react';
 
 // Componente funcional ProductCard: Muestra una tarjeta individual de producto.
 // Props:
-// - producto: Objeto con los datos del producto (id, name, precio, descripcion, image, reviews).
+// - producto: Objeto con los datos del producto (id, name, precio, descripcion, image, reviews, stock).
 // - onAddToCart: Función para añadir el producto al carrito.
 // - onOpenDetails: Función para abrir el modal de detalles del producto.
 // - isFavorite: Booleano que indica si el producto es favorito.
 // - onToggleFavorite: Nueva función para añadir/quitar de favoritos.
 const ProductCard = React.memo(({ producto, onAddToCart, onOpenDetails, isFavorite, onToggleFavorite }) => {
-  // Estado local para la cantidad del producto a añadir al carrito
-  const [quantity, setQuantity] = useState(1); // Inicializa la cantidad en 1
-
-  // Aseguramos que precio sea un número válido y lo redondeamos a un número entero
+  // Aseguramos que precio y stock sean números válidos
   const displayPrecio = typeof producto.precio === 'number' ? Math.floor(producto.precio) : 'N/A';
+  const currentStock = typeof producto.stock === 'number' ? producto.stock : 0;
+  const isProductOutOfStock = currentStock <= 0;
 
-  // Manejador para incrementar la cantidad, asegurando que no baje de 1
+  // Estado local para la cantidad del producto a añadir al carrito
+  // Inicializa la cantidad en 1, pero no más que el stock disponible si no está agotado
+  const [quantity, setQuantity] = useState(isProductOutOfStock ? 0 : 1); 
+
+  // Manejador para incrementar la cantidad, asegurando que no exceda el stock
   const handleIncreaseQuantity = useCallback(() => {
-    setQuantity(prevQuantity => prevQuantity + 1);
-  }, []);
+    setQuantity(prevQuantity => Math.min(prevQuantity + 1, currentStock));
+  }, [currentStock]);
 
   // Manejador para decrementar la cantidad, asegurando que no baje de 1
   const handleDecreaseQuantity = useCallback(() => {
     setQuantity(prevQuantity => (prevQuantity > 1 ? prevQuantity - 1 : 1));
   }, []);
 
-  // Manejador para cambiar la cantidad desde el input, validando que sea un número positivo
+  // Manejador para cambiar la cantidad desde el input, validando que sea un número positivo y no exceda el stock
   const handleQuantityChange = useCallback((e) => {
     const value = parseInt(e.target.value, 10);
     if (!isNaN(value) && value >= 1) {
-      setQuantity(value);
+      setQuantity(Math.min(value, currentStock)); // Limita la cantidad al stock
     } else if (e.target.value === '') { // Permite vaciar el input temporalmente
       setQuantity('');
     }
-  }, []);
+  }, [currentStock]);
 
-  // Manejador para el blur del input, asegura que la cantidad sea al menos 1
+  // Manejador para el blur del input, asegura que la cantidad sea al menos 1 y no exceda el stock
   const handleQuantityBlur = useCallback(() => {
     if (quantity === '' || isNaN(quantity) || quantity < 1) {
       setQuantity(1);
+    } else if (quantity > currentStock) {
+      setQuantity(currentStock); // Ajusta la cantidad si excede el stock al salir del foco
     }
-  }, [quantity]);
+  }, [quantity, currentStock]);
 
-  // Calcular el promedio de las calificaciones (si existen)
+  // Calcular el promedio de las calificaciones de reseñas aprobadas (si existen)
   const averageRating = producto.reviews && producto.reviews.length > 0
-    ? (producto.reviews.reduce((sum, review) => sum + (review.rating || 0), 0) / producto.reviews.length)
+    ? (producto.reviews.filter(r => r.status === 'approved').reduce((sum, review) => sum + (review.rating || 0), 0) / producto.reviews.filter(r => r.status === 'approved').length)
     : 0;
 
   return (
@@ -109,7 +114,7 @@ const ProductCard = React.memo(({ producto, onAddToCart, onOpenDetails, isFavori
         </p>
         
         {/* Sección de calificación por estrellas */}
-        {producto.reviews && producto.reviews.length > 0 && (
+        {averageRating > 0 && ( // Mostrar solo si hay reseñas aprobadas
           <div className="flex items-center mb-3">
             {Array.from({ length: 5 }).map((_, i) => (
               <Star
@@ -123,14 +128,22 @@ const ProductCard = React.memo(({ producto, onAddToCart, onOpenDetails, isFavori
               />
             ))}
             <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-              ({producto.reviews.length} reseñas)
+              ({producto.reviews.filter(r => r.status === 'approved').length} reseñas)
             </span>
           </div>
         )}
 
-        <p className="text-2xl font-extrabold text-red-600 dark:text-red-400 mb-4 mt-auto">
+        <p className="text-2xl font-extrabold text-red-600 dark:text-red-400 mb-2 mt-auto">
           ${displayPrecio} {/* Mostrar precio sin centavos */}
         </p>
+
+        {/* Indicador de Stock (solo "Agotado") */}
+        <div className="text-sm mb-4">
+          {isProductOutOfStock && (
+            <span className="font-semibold text-red-500 dark:text-red-400">Agotado</span>
+          )}
+          {/* No se muestra la cantidad exacta de stock */}
+        </div>
 
         {/* Controles de cantidad y botón "Agregar al carrito" */}
         {onAddToCart && (
@@ -140,6 +153,7 @@ const ProductCard = React.memo(({ producto, onAddToCart, onOpenDetails, isFavori
                 onClick={(e) => { e.stopPropagation(); handleDecreaseQuantity(); }} // Detiene la propagación para no abrir el modal
                 className="p-1 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-300"
                 aria-label="Disminuir cantidad"
+                disabled={isProductOutOfStock || quantity <= 1} // Deshabilita si agotado o cantidad es 1
               >
                 <Minus size={18} />
               </button>
@@ -153,12 +167,15 @@ const ProductCard = React.memo(({ producto, onAddToCart, onOpenDetails, isFavori
                 onClick={(e) => e.stopPropagation()} // Detiene la propagación para no abrir el modal
                 className="w-12 text-center bg-transparent text-gray-900 dark:text-gray-100 font-semibold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 min="1"
+                max={currentStock} // Limita el input al stock disponible
                 aria-label="Cantidad de producto"
+                disabled={isProductOutOfStock} // Deshabilita si agotado
               />
               <button
                 onClick={(e) => { e.stopPropagation(); handleIncreaseQuantity(); }} // Detiene la propagación
                 className="p-1 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-300"
                 aria-label="Aumentar cantidad"
+                disabled={isProductOutOfStock || quantity >= currentStock} // Deshabilita si agotado o ya en stock máximo
               >
                 <Plus size={18} />
               </button>
@@ -169,11 +186,12 @@ const ProductCard = React.memo(({ producto, onAddToCart, onOpenDetails, isFavori
                 onAddToCart(producto, quantity);
                 setQuantity(1); // RESTABLECE LA CANTIDAD A 1 DESPUÉS DE AÑADIR AL CARRITO
               }}
-              className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white text-base font-medium py-2 px-4 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-300 dark:focus:ring-red-800"
+              className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white text-base font-medium py-2 px-4 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-300 dark:focus:ring-800 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Agregar al carrito"
+              disabled={isProductOutOfStock} // Deshabilita si agotado
             >
               <ShoppingCart size={20} />
-              Agregar
+              {isProductOutOfStock ? 'Agotado' : 'Agregar'}
             </button>
           </div>
         )}

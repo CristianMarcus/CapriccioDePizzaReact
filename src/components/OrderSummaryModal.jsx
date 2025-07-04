@@ -31,10 +31,10 @@ const OrderSummaryModal = ({ cartItems, onClose, onBack, onContinue }) => {
               <div key={item.id} className="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-4 last:border-b-0">
                 <div className="flex items-center">
                   <img
-                    src={item.image || `https://placehold.co/60x60/FF0000/FFFFFF?text=${encodeURIComponent(item.name.substring(0,2))}`}
+                    src={item.image || `https://placehold.co/60x60/FF0000/FFFFFF?text=${encodeURIComponent(item.name.substring(0, 2))}`}
                     alt={item.name}
                     className="w-12 h-12 object-cover rounded-lg mr-3 shadow-sm"
-                    onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/60x60/FF0000/FFFFFF?text=${encodeURIComponent(item.name.substring(0,2))}`; }}
+                    onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/60x60/FF0000/FFFFFF?text=${encodeURIComponent(item.name.substring(0, 2))}`; }}
                   />
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{item.name}</h3>

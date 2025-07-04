@@ -7,6 +7,7 @@ const ProductForm = ({ product, onClose, onSave, showNotification }) => {
     descripcion: '', // Cambiado de 'description' a 'descripcion'
     precio: '',      // Cambiado de 'price' a 'precio'
     category: '',
+    stock: '',       // NUEVO: Campo para el stock
     image: '',
   });
   const [imageFile, setImageFile] = useState(null);
@@ -21,6 +22,7 @@ const ProductForm = ({ product, onClose, onSave, showNotification }) => {
         descripcion: product.descripcion || '', // Accediendo a product.descripcion
         precio: product.precio || '',            // Accediendo a product.precio
         category: product.category || '',
+        stock: product.stock !== undefined ? product.stock : '', // Cargar stock si existe
         image: product.image || '',
       });
       setImagePreview(product.image || '');
@@ -30,6 +32,7 @@ const ProductForm = ({ product, onClose, onSave, showNotification }) => {
         descripcion: '',
         precio: '',
         category: '',
+        stock: '', // Limpiar stock para nuevo producto
         image: '',
       });
       setImagePreview('');
@@ -73,15 +76,15 @@ const ProductForm = ({ product, onClose, onSave, showNotification }) => {
       throw new Error("Cloudinary configuration missing or invalid.");
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    const formDataToSend = new FormData(); // Renombrado para evitar conflicto con el estado formData
+    formDataToSend.append('file', file);
+    formDataToSend.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
 
     try {
       showNotification('Subiendo imagen a Cloudinary...', 'info', 0); // Notificación persistente
       const response = await fetch(CLOUDINARY_URL, {
         method: 'POST',
-        body: formData,
+        body: formDataToSend, // Usar el FormData renombrado
       });
 
       if (!response.ok) {
@@ -141,19 +144,16 @@ const ProductForm = ({ product, onClose, onSave, showNotification }) => {
 
     const productToSave = {
       ...formData,
-      // Asegurarse de que el precio se guarda como número
-      precio: parseFloat(formData.precio), // Asegúrate de usar formData.precio
+      // Asegurarse de que el precio se guarda como número flotante
+      precio: parseFloat(formData.precio),
+      // NUEVO: Asegurarse de que el stock se guarda como número entero
+      stock: parseInt(formData.stock, 10), 
       image: imageUrl,
     };
 
-    if (!productToSave.name || productToSave.precio <= 0 || !productToSave.category) { // Usar productToSave.precio
-      showNotification('Por favor, completa todos los campos requeridos (Nombre, Precio > 0, Categoría).', 'error');
-      setFormLoading(false);
-      return;
-    }
-
-    if (isNaN(productToSave.precio)) { // Usar productToSave.precio
-      showNotification('El precio debe ser un número válido.', 'error');
+    // Validaciones básicas antes de guardar
+    if (!productToSave.name || productToSave.precio <= 0 || isNaN(productToSave.precio) || !productToSave.category || isNaN(productToSave.stock) || productToSave.stock < 0) {
+      showNotification('Por favor, completa todos los campos requeridos y asegúrate de que el Precio y el Stock sean números válidos y positivos.', 'error');
       setFormLoading(false);
       return;
     }
@@ -171,7 +171,7 @@ const ProductForm = ({ product, onClose, onSave, showNotification }) => {
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex justify-center items-center p-4 z-50 overflow-y-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-lg transform transition-all duration-300 scale-100 opacity-100">
+      <div className="bg-white dark:bg-800 rounded-lg shadow-2xl p-6 w-full max-w-lg transform transition-all duration-300 scale-100 opacity-100">
         <div className="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-700 mb-4">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             {product ? 'Editar Producto' : 'Añadir Nuevo Producto'}
@@ -207,9 +207,9 @@ const ProductForm = ({ product, onClose, onSave, showNotification }) => {
               Descripción:
             </label>
             <textarea
-              id="descripcion" // Cambiado de 'description' a 'descripcion'
-              name="descripcion" // Cambiado de 'description' a 'descripcion'
-              value={formData.descripcion} // Usando formData.descripcion
+              id="descripcion"
+              name="descripcion"
+              value={formData.descripcion}
               onChange={handleChange}
               rows="3"
               className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -224,9 +224,9 @@ const ProductForm = ({ product, onClose, onSave, showNotification }) => {
               </label>
               <input
                 type="number"
-                id="precio" // Cambiado de 'price' a 'precio'
-                name="precio" // Cambiado de 'price' a 'precio'
-                value={formData.precio} // Usando formData.precio
+                id="precio"
+                name="precio"
+                value={formData.precio}
                 onChange={handleChange}
                 step="0.01"
                 className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -234,21 +234,40 @@ const ProductForm = ({ product, onClose, onSave, showNotification }) => {
                 disabled={formLoading || isUploadingImage}
               />
             </div>
+            {/* NUEVO CAMPO DE STOCK */}
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Categoría:
+              <label htmlFor="stock" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Stock:
               </label>
               <input
-                type="text"
-                id="category"
-                name="category"
-                value={formData.category}
+                type="number"
+                id="stock"
+                name="stock"
+                value={formData.stock}
                 onChange={handleChange}
+                min="0" // Asegura que el stock no sea negativo
+                step="1"
                 className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 required
                 disabled={formLoading || isUploadingImage}
               />
             </div>
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Categoría:
+            </label>
+            <input
+              type="text"
+              id="category"
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              required
+              disabled={formLoading || isUploadingImage}
+            />
           </div>
 
           <div className="mb-4">

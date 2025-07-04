@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import ProductCard from './components/ProductCard';
-// REMOVIDO: ProductCardSkeleton ya no es necesario
 import ShoppingCartModal from './components/ShoppingCartModal';
 import OrderFormModal from './components/OrderFormModal';
 import OrderSummaryModal from './components/OrderSummaryModal';
@@ -10,17 +9,15 @@ import FeaturedProductsSection from './components/FeaturedProductsSection';
 import Footer from './components/Footer';
 import PowaContactForm from './components/PowaContactForm';
 import './App.css';
-// AÑADIDO: Loader2 para el spinner de carga
 import { ShoppingCart, Search, Sun, Moon, ArrowUp, Heart, UserCheck, LogOut, LayoutDashboard, Loader2 } from 'lucide-react'; 
 
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query, addDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, query, addDoc, updateDoc } from 'firebase/firestore';
 
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 
-// Importaciones de React Router DOM para la navegación
 import { Routes, Route, useNavigate } from 'react-router-dom';
 
 
@@ -48,8 +45,7 @@ function App() {
 
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [hasShownAdminWelcome, setHasShownAdminWelcome] = useState(() => {
-    // Al iniciar, verifica si ya se mostró el mensaje en esta sesión
-    if (typeof window !== 'undefined' && window.sessionStorage) { // Usamos sessionStorage, no localStorage, para que el mensaje se reinicie con cada nueva sesión del navegador
+    if (typeof window !== 'undefined' && window.sessionStorage) {
       const saved = sessionStorage.getItem('hasShownAdminWelcomeThisSession');
       return saved ? JSON.parse(saved) : false;
     }
@@ -76,18 +72,19 @@ function App() {
   const [auth, setAuth] = useState(null);
   const [userId, setUserId] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
-  const [isAuthReady, setIsAuthReady] = useState(false); // Indica si la autenticación ha completado su verificación inicial
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true); // Nuevo estado para la carga explícita de autenticación
-  const [isFirebaseInitialized, setIsFirebaseInitialized] = useState(false); // Nuevo estado para asegurar que Firebase se inicialice solo una vez
+  const [isAuthReady, setIsAuthReady] = useState(false);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [isFirebaseInitialized, setIsFirebaseInitialized] = useState(false);
 
-  const [currentPage, setCurrentPage] = useState('home'); // Estado para controlar la página actual (para enrutamiento interno de la app, previo a react-router)
-  const navigate = useNavigate(); // Hook de react-router-dom para la navegación programática
+  const [currentPage, setCurrentPage] = useState('home');
+  const navigate = useNavigate();
 
   const canvasAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
   const canvasFirebaseConfig = typeof __firebase_config !== 'undefined' && __firebase_config !== ''
     ? JSON.parse(__firebase_config)
     : {};
   const canvasInitialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
 
   const localFirebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -520,7 +517,17 @@ function App() {
   // Añade un producto al carrito o incrementa su cantidad
   const handleAddToCart = useCallback((productToAdd, quantityToAdd = 1) => {
     setCartItems((prevItems) => {
+      // Verificar si hay suficiente stock antes de añadir
+      const productInProductsState = productos.find(p => p.id === productToAdd.id);
+      const currentStock = productInProductsState ? productInProductsState.stock : 0;
       const existingItem = prevItems.find((item) => item.id === productToAdd.id);
+      const newQuantity = existingItem ? existingItem.quantity + quantityToAdd : quantityToAdd;
+
+      if (newQuantity > currentStock) {
+        showNotification(`No hay suficiente stock para añadir ${quantityToAdd} unidad(es) de ${productToAdd.name}. Stock disponible: ${currentStock}`, 'error', 3000);
+        return prevItems; // No modificar el carrito si no hay stock
+      }
+
       if (existingItem) {
         showNotification(`${productToAdd.name} +${quantityToAdd} unidad(es)`, 'info', 1500);
         return prevItems.map((item) =>
@@ -531,16 +538,26 @@ function App() {
         return [...prevItems, { ...productToAdd, quantity: quantityToAdd }];
       }
     });
-  }, [showNotification]);
+  }, [showNotification, productos]); // Depende de 'productos' para verificar el stock
 
   // Incrementa la cantidad de un producto en el carrito
   const handleIncreaseQuantity = useCallback((productId) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
-  }, []);
+    setCartItems((prevItems) => {
+      const productInProductsState = productos.find(p => p.id === productId);
+      const currentStock = productInProductsState ? productInProductsState.stock : 0;
+
+      return prevItems.map((item) => {
+        if (item.id === productId) {
+          if (item.quantity + 1 > currentStock) {
+            showNotification(`No hay suficiente stock para añadir más de ${item.name}. Stock disponible: ${currentStock}`, 'error', 2000);
+            return item; // No incrementar si excede el stock
+          }
+          return { ...item, quantity: item.quantity + 1 };
+        }
+        return item;
+      });
+    });
+  }, [showNotification, productos]); // Depende de 'productos' para verificar el stock
 
   // Decrementa la cantidad de un producto en el carrito
   const handleDecreaseQuantity = useCallback((productId) => {
@@ -578,7 +595,7 @@ function App() {
   }, []);
 
   // Envía el pedido (a Firestore y WhatsApp)
-  const handleSendOrder = useCallback(async ({ name, address, phone, paymentMethod, cashAmount }) => {
+  const handleSendOrder = useCallback(async ({ name, address, phone, paymentMethod, cashAmount, deliveryMethod, orderType, orderTime, notes }) => {
     if (!db) {
       showNotification('Error: Base de datos no disponible para guardar el pedido. Intenta recargar la página.', 'error', 5000);
       return;
@@ -600,23 +617,40 @@ function App() {
     const totalForDisplay = Math.floor(totalCalculated);
 
     let paymentInfoWhatsapp = '';
-    let status = 'Pendiente';
+    let status = 'Pendiente'; // Estado inicial del pedido
+    let deliveryInfoWhatsapp = '';
+    let orderTimeInfoWhatsapp = '';
 
     if (paymentMethod === 'cash') {
       const parsedCashAmount = parseFloat(cashAmount);
       const change = (parsedCashAmount >= totalForDisplay) ? Math.floor(parsedCashAmount - totalForDisplay) : 0;
       paymentInfoWhatsapp = `*Método de Pago:* Efectivo\n*Abona con:* $${Math.floor(parsedCashAmount)}\n*Vuelto:* $${change}`;
     } else if (paymentMethod === 'mercadopago') {
-      paymentInfoWhatsapp = `*Método de Pago:* Mercado Pago\n_(Se requiere comprobante al recibir)_`;
+      paymentInfoWhatsapp = `*Método de Pago:* Mercado Pago\n_(Se requiere comprobante para confirmar)_`;
+    }
+
+    if (deliveryMethod === 'pickup') {
+      deliveryInfoWhatsapp = `*Método de Entrega:* Retiro en el local (Av. Monteverde N° 1181, Quilmes)`;
+    } else if (deliveryMethod === 'delivery') {
+      deliveryInfoWhatsapp = `*Método de Entrega:* Delivery a domicilio (sin cargo)\n*Dirección:* ${address}`;
+    }
+
+    if (orderType === 'immediate') {
+      orderTimeInfoWhatsapp = `*Tipo de Pedido:* Inmediato`;
+    } else if (orderType === 'reserved' && orderTime) {
+      const reservedDate = new Date(orderTime);
+      orderTimeInfoWhatsapp = `*Tipo de Pedido:* Reserva para el ${reservedDate.toLocaleString('es-AR')}`;
     }
 
     const whatsappMessage = `
-*--- CAPRICCIO PIZZA APP ---*
+*--- CAPRICCIO APP ---*
 
 *Datos del Cliente:*
 Nombre: ${name}
-Dirección: ${address}
 Teléfono: ${phone}
+${deliveryInfoWhatsapp}
+${orderTimeInfoWhatsapp}
+${notes ? `*Notas:* ${notes}` : ''}
 
 *Detalle del Pedido:*
 ${orderDetailsForWhatsapp}
@@ -632,23 +666,51 @@ ${paymentInfoWhatsapp}
     try {
       const ordersCollectionRef = collection(db, `artifacts/${canvasAppId}/public/data/orders`);
       const orderData = {
-        userId: userId || 'anonimo', // Usa el userId real o 'anonimo'
+        userId: userId || 'anonimo',
         cartItems: cartItems.map(item => ({
           id: item.id,
           name: item.name,
           quantity: item.quantity,
           precio: item.precio,
+          // Puedes añadir más detalles del producto si los necesitas en el pedido guardado
         })),
         total: totalCalculated,
         customerInfo: { name, address, phone },
         paymentMethod: paymentMethod,
         cashAmount: parseFloat(cashAmount) || 0,
         change: Math.floor(parseFloat(cashAmount) - totalCalculated),
+        deliveryMethod: deliveryMethod, // Guardar método de entrega
+        orderType: orderType,           // Guardar tipo de pedido
+        orderTime: orderTime,           // Guardar fecha/hora de reserva
+        notes: notes,                   // Guardar notas
         createdAt: new Date().toISOString(),
         status: status,
       };
       await addDoc(ordersCollectionRef, orderData);
       showNotification('Pedido guardado y enviado a WhatsApp!', 'success', 3000);
+
+      // =====================================================================
+      // LÓGICA: Descontar stock de los productos
+      // =====================================================================
+      for (const item of cartItems) {
+        try {
+          const productRef = doc(db, `artifacts/${canvasAppId}/public/data/products/${item.id}`);
+          const productSnap = await getDoc(productRef);
+          if (productSnap.exists()) {
+            const currentStock = productSnap.data().stock || 0;
+            const newStock = Math.max(0, currentStock - item.quantity); // Asegura que el stock no sea negativo
+            await updateDoc(productRef, { stock: newStock });
+            console.log(`Stock de producto ${item.name} (ID: ${item.id}) actualizado de ${currentStock} a ${newStock}`);
+          } else {
+            console.warn(`Producto con ID ${item.id} no encontrado en Firestore para actualizar stock.`);
+          }
+        } catch (stockUpdateError) {
+          console.error(`Error al actualizar stock para el producto ${item.id}:`, stockUpdateError);
+          showNotification(`Advertencia: No se pudo actualizar el stock de ${item.name}.`, 'warning', 5000);
+        }
+      }
+      // =====================================================================
+
     } catch (firebaseError) {
       let userErrorMessage = 'Error al guardar el pedido. Por favor, inténtalo de nuevo.';
       if (firebaseError.code === 'permission-denied') {
@@ -670,23 +732,26 @@ ${paymentInfoWhatsapp}
 
     setCartItems([]); // Vacía el carrito después de enviar
     setIsOrderFormModalOpen(false); // Cierra el modal del formulario
-  }, [cartItems, showNotification, db, canvasAppId, userId]);
+  }, [cartItems, showNotification, db, canvasAppId, userId, productos]);
+
 
   // Funciones para manejar la navegación interna de la aplicación (usando `currentPage` y `navigate`)
+  // DEFINICIÓN DE LAS FUNCIONES PARA EL FOOTER Y OTRAS NAVEGACIONES
   const handleOpenPowaContactForm = useCallback(() => {
     setCurrentPage('powa-contact');
-    navigate('/contact'); // Ejemplo de cómo se integraría con react-router-dom si creas una ruta para ello
+    navigate('/contact');
   }, [navigate]);
 
   const handleClosePowaContactForm = useCallback(() => {
     setCurrentPage('home');
-    navigate('/'); // Vuelve a la página de inicio
+    navigate('/');
   }, [navigate]);
 
   const handleOpenAdminLoginFromFooter = useCallback(() => {
     setCurrentPage('admin-login');
-    navigate('/login-admin'); // Redirige a la ruta de login de administrador
+    navigate('/login-admin');
   }, [navigate]);
+  // FIN DE DEFINICIÓN DE FUNCIONES
 
   // Condición de carga ajustada: espera a que tanto los productos como la autenticación estén listos
   const isLoadingApp = loadingProducts || isLoadingAuth || isLoggingOut; 
@@ -937,6 +1002,7 @@ ${paymentInfoWhatsapp}
                 onSendOrder={(data) => {
                   handleSendOrder(data);
                 }}
+                showNotification={showNotification}
               />
             )}
 

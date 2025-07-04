@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, getDocs, where } from 'firebase/firestore';
 import ProductForm from './ProductForm';
-import { Edit, Trash2, PlusCircle, ShoppingBag, Box, LogOut, Filter, Home, Star, MessageSquare, BarChart2, DollarSign, ListOrdered, TrendingUp, Eraser } from 'lucide-react'; 
+import { Edit, Trash2, PlusCircle, ShoppingBag, Box, LogOut, Filter, Home, Star, MessageSquare, BarChart2, DollarSign, ListOrdered, TrendingUp, Eraser, Loader2, Search } from 'lucide-react'; 
 
 const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, hasShownAdminWelcome, setHasShownAdminWelcome }) => { 
   const [activeTab, setActiveTab] = useState('products');
@@ -21,10 +21,15 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
   const [editingProduct, setEditingProduct] = useState(null);
   const [clearingOrders, setClearingOrders] = useState(false); 
   const [selectedCategory, setSelectedCategory] = useState('all'); 
+  // Nuevo estado para el término de búsqueda de productos
+  const [productSearchTerm, setProductSearchTerm] = useState('');
 
   const [selectedMetricsTimeRange, setSelectedMetricsTimeRange] = useState('all');
   const [selectedOrderListTimeRange, setSelectedOrderListTimeRange] = useState('all');
   const [selectedReviewsTimeRange, setSelectedReviewsTimeRange] = useState('all');
+
+  // Nuevo estado para controlar qué producto está actualizando su stock
+  const [updatingStockId, setUpdatingStockId] = useState(null);
 
   // Nuevo useEffect para mostrar el mensaje de bienvenida al administrador
   useEffect(() => {
@@ -250,7 +255,7 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
   }, [products]);
 
 
-  // Lógica para filtrar productos por categoría
+  // Lógica para filtrar productos por categoría y término de búsqueda
   const uniqueCategories = useMemo(() => {
     const categories = products.map(product => product.category).filter(Boolean);
     return ['all', ...new Set(categories.sort())];
@@ -259,12 +264,23 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
   const filteredAndSortedProducts = useMemo(() => {
     let currentProducts = products;
 
+    // Filtrar por categoría
     if (selectedCategory !== 'all') {
       currentProducts = currentProducts.filter(product => product.category === selectedCategory);
     }
 
+    // Filtrar por término de búsqueda (nombre o descripción)
+    if (productSearchTerm.trim() !== '') {
+      const lowerCaseSearchTerm = productSearchTerm.toLowerCase();
+      currentProducts = currentProducts.filter(product =>
+        (product.name && product.name.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (product.descripcion && product.descripcion.toLowerCase().includes(lowerCaseSearchTerm))
+      );
+    }
+
+    // Ordenar alfabéticamente por nombre
     return currentProducts.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-  }, [products, selectedCategory]);
+  }, [products, selectedCategory, productSearchTerm]);
 
 
   // Función para borrar todos los pedidos (y restablecer métricas)
@@ -280,7 +296,7 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
         confirmModal.innerHTML = `
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-sm sm:max-w-md">
                 <h3 class="text-xl sm:text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">Confirmar Eliminación</h3>
-                <p class="text-gray-700 dark:text-gray-300 mb-6 text-sm sm:text-base">¿Estás SEGURO de que quieres ELIMINAR TODOS los pedidos? Esta acción es irreversible.</p>
+                <p class="text-700 dark:text-gray-300 mb-6 text-sm sm:text-base">¿Estás SEGURO de que quieres ELIMINAR TODOS los pedidos? Esta acción es irreversible.</p>
                 <div class="flex justify-end space-x-3">
                     <button id="cancelConfirm" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-md shadow-sm transition-all duration-200 text-sm sm:text-base">Cancelar</button>
                     <button id="okConfirm" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md shadow-sm transition-all duration-200 text-sm sm:text-base">Eliminar Todo</button>
@@ -333,6 +349,27 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
     }
   };
 
+  // NUEVA FUNCIÓN: Actualizar stock de un producto directamente
+  const handleUpdateProductStock = useCallback(async (productId, newStockValue) => {
+    if (!db) {
+      showNotification("Error: Firestore no está inicializado.", "error");
+      return;
+    }
+    setUpdatingStockId(productId); // Establece el estado de carga para este producto
+    try {
+      const productDocRef = doc(db, `artifacts/${appId}/public/data/products/${productId}`);
+      // Asegura que newStockValue sea un número entero no negativo
+      const stockToUpdate = Math.max(0, parseInt(newStockValue, 10) || 0); 
+      await updateDoc(productDocRef, { stock: stockToUpdate });
+      showNotification(`Stock de ${productNameMap[productId] || 'producto'} actualizado a ${stockToUpdate}.`, 'success');
+    } catch (err) {
+      console.error("Error al actualizar stock del producto:", err);
+      showNotification(`Error al actualizar stock: ${err.message}`, 'error');
+    } finally {
+      setUpdatingStockId(null); // Limpia el estado de carga
+    }
+  }, [db, appId, productNameMap, showNotification]);
+
 
   // Funciones de gestión de productos (CRUD individual)
   const handleAddProduct = async (productData) => {
@@ -352,6 +389,7 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
       const productToSave = { 
         ...productData, 
         precio: typeof productData.precio === 'string' ? parseFloat(productData.precio) : productData.precio,
+        stock: typeof productData.stock === 'string' ? parseInt(productData.stock, 10) : productData.stock, // Asegura que stock sea número
         createdAt: new Date().toISOString() 
       };
 
@@ -376,7 +414,8 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
       const productDocRef = doc(db, `artifacts/${appId}/public/data/products/${productId}`);
       const productToUpdate = { 
         ...productData, 
-        precio: typeof productData.precio === 'string' ? parseFloat(productData.precio) : productData.precio 
+        precio: typeof productData.precio === 'string' ? parseFloat(productData.precio) : productData.precio,
+        stock: typeof productData.stock === 'string' ? parseInt(productData.stock, 10) : productData.stock // Asegura que stock sea número
       };
       await updateDoc(productDocRef, productToUpdate);
       console.log("AdminDashboard: [handleUpdateProduct] Documento actualizado. ID:", productId, "Datos:", productToUpdate);
@@ -643,7 +682,7 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
               </label>
               <select
                 id="category-filter"
-                name="categoryFilter" // ADDED name attribute
+                name="categoryFilter"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="w-full sm:w-auto p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-red-500 focus:border-red-500 text-sm sm:text-base"
@@ -654,34 +693,39 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
                   </option>
                 ))}
               </select>
+
+              {/* Input de búsqueda para productos */}
+              <div className="relative w-full sm:w-auto flex-grow">
+                <input
+                  type="text"
+                  id="product-search"
+                  name="productSearch"
+                  placeholder="Buscar producto..."
+                  value={productSearchTerm}
+                  onChange={(e) => setProductSearchTerm(e.target.value)}
+                  className="w-full p-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-400 focus:ring-red-500 focus:border-red-500 text-sm sm:text-base"
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400" size={18} />
+              </div>
             </div>
 
             {filteredAndSortedProducts.length === 0 ? (
               <p className="text-center text-gray-500 dark:text-gray-400 py-10">
-                {selectedCategory === 'all'
+                {selectedCategory === 'all' && productSearchTerm === ''
                   ? "No hay productos para mostrar. Añade uno nuevo."
-                  : `No hay productos en la categoría "${selectedCategory}".`}
+                  : "No se encontraron productos que coincidan con los filtros aplicados."}
               </p>
             ) : (
               <div className="overflow-x-auto rounded-lg shadow-md">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Imagen
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Nombre
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">
-                        Categoría
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Precio
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Acciones
-                      </th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Imagen</th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nombre</th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">Categoría</th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Precio</th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Stock</th>
+                      <th scope="col" className="px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -703,6 +747,29 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
                         </td>
                         <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                           ${Math.floor(typeof product.precio === 'number' ? product.precio : 0)}
+                        </td>
+                        {/* CAMPO DE STOCK EDITABLE INLINE */}
+                        <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                          <div className="relative flex items-center">
+                            <input
+                              type="number"
+                              min="0"
+                              value={product.stock || 0} // Asegura que sea un número, por defecto 0
+                              onChange={(e) => {
+                                // Actualización optimista del estado local para feedback inmediato
+                                const newProducts = products.map(p =>
+                                  p.id === product.id ? { ...p, stock: parseInt(e.target.value, 10) || 0 } : p
+                                );
+                                setProducts(newProducts);
+                              }}
+                              onBlur={(e) => handleUpdateProductStock(product.id, parseInt(e.target.value, 10) || 0)}
+                              className="w-20 p-1 border rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-red-500 focus:border-red-500 text-sm"
+                              disabled={updatingStockId === product.id} // Deshabilita mientras se actualiza
+                            />
+                            {updatingStockId === product.id && (
+                              <Loader2 size={16} className="animate-spin text-blue-500 ml-2 absolute right-2" />
+                            )}
+                          </div>
                         </td>
                         <td className="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <button
@@ -745,8 +812,8 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
               <h3 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-3 sm:mb-0">Pedidos</h3>
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
                 <select
-                  id="order-list-time-range" // ADDED id attribute
-                  name="orderListTimeRange" // ADDED name attribute
+                  id="order-list-time-range"
+                  name="orderListTimeRange"
                   value={selectedOrderListTimeRange}
                   onChange={(e) => setSelectedOrderListTimeRange(e.target.value)}
                   className="w-full sm:w-auto p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-red-500 focus:border-red-500 text-sm sm:text-base"
@@ -775,24 +842,12 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        ID
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">
-                        Cliente (UID)
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Fecha
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Total
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Estado
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Acciones
-                      </th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">Cliente (UID)</th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Fecha</th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total</th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Estado</th>
+                      <th scope="col" className="px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -812,8 +867,8 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
                         </td>
                         <td className="px-3 py-4 whitespace-nowrap text-sm">
                           <select
-                            id={`order-status-${order.id}`} // ADDED unique id
-                            name="orderStatus" // ADDED name attribute
+                            id={`order-status-${order.id}`}
+                            name="orderStatus"
                             value={order.status || 'Pendiente'}
                             onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
                             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 text-sm" 
@@ -843,8 +898,8 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
               <h3 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-3 sm:mb-0">Reseñas de Productos</h3>
               <select
-                id="reviews-time-range" // ADDED id attribute
-                name="reviewsTimeRange" // ADDED name attribute
+                id="reviews-time-range"
+                name="reviewsTimeRange"
                 value={selectedReviewsTimeRange}
                 onChange={(e) => setSelectedReviewsTimeRange(e.target.value)}
                 className="w-full sm:w-auto p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-red-500 focus:border-red-500 text-sm sm:text-base"
@@ -862,27 +917,13 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Producto
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">
-                        Usuario
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Calificación
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Comentario
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">
-                        Fecha
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Estado
-                      </th>
-                      <th scope="col" className="px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Acciones
-                      </th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Producto</th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">Usuario</th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Calificación</th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Comentario</th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">Fecha</th>
+                      <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Estado</th>
+                      <th scope="col" className="px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -934,8 +975,8 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
                           </td>
                           <td className="px-3 py-4 whitespace-nowrap text-sm">
                             <select
-                              id={`review-status-${review.id}`} // ADDED unique id
-                              name="reviewStatus" // ADDED name attribute
+                              id={`review-status-${review.id}`}
+                              name="reviewStatus"
                               value={review.status || 'pending'} 
                               onChange={(e) => handleUpdateReviewStatus(review.id, e.target.value)}
                               className="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 text-sm" 
@@ -971,8 +1012,8 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
               <h3 className="text-2xl sm:text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-3 sm:mb-0">Métricas de Ventas</h3>
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
                 <select
-                  id="metrics-time-range" // ADDED id attribute
-                  name="metricsTimeRange" // ADDED name attribute
+                  id="metrics-time-range"
+                  name="metricsTimeRange"
                   value={selectedMetricsTimeRange}
                   onChange={(e) => setSelectedMetricsTimeRange(e.target.value)}
                   className="w-full sm:w-auto p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-red-500 focus:border-red-500 text-sm sm:text-base"
@@ -1029,15 +1070,9 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                       <thead className="bg-gray-50 dark:bg-gray-700">
                         <tr>
-                          <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Producto
-                          </th>
-                          <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Cantidad Vendida
-                          </th>
-                           <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Ingresos
-                          </th>
+                          <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Producto</th>
+                          <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Cantidad Vendida</th>
+                           <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ingresos</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -1065,15 +1100,9 @@ const AdminDashboard = ({ db, appId, onLogout, showNotification, onGoToHome, has
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                       <thead className="bg-gray-50 dark:bg-gray-700">
                         <tr>
-                          <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Producto
-                          </th>
-                          <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Ingresos Totales
-                          </th>
-                          <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Cantidad Vendida
-                          </th>
+                          <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Producto</th>
+                          <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ingresos Totales</th>
+                          <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Cantidad Vendida</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
