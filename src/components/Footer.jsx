@@ -1,5 +1,5 @@
 import React from 'react';
-import { Facebook, Instagram, Twitter, MapPin, Mail, Phone, Briefcase, UserCheck, Code } from 'lucide-react';
+import { Facebook, Instagram, Twitter, MapPin, Mail, Phone, Briefcase, UserCheck } from 'lucide-react';
 
 const Footer = ({ onOpenPowaContactForm, onOpenAdminLogin, userProfile }) => {
   const currentYear = new Date().getFullYear();
@@ -66,9 +66,20 @@ const Footer = ({ onOpenPowaContactForm, onOpenAdminLogin, userProfile }) => {
           </ul>
         </div>
 
-        {/* Sección 4 (vacía o para otro contenido, ya que la agencia se movió) */}
-        <div>
-           {/* Aquí puedes poner 'Políticas de Privacidad', 'Términos de Servicio', etc. */}
+        {/* Sección 4: Contenido Adicional (Aquí agregamos la imagen del logo con redondeo perfecto) */}
+        <div className="text-center md:text-left">
+          <h4 className="text-xl font-semibold text-white dark:text-gray-100 mb-4">¡Síguenos!</h4>
+          <div className="flex justify-center md:justify-start group"> {/* Añadimos 'group' aquí para el hover */}
+            <img
+              src="/capriccio-redondo.png" // Asegúrate de que esta ruta sea correcta
+              alt="Logo de Capriccio de Pizza"
+              className="w-32 h-32 object-cover rounded-full
+                         border-2 border-white shadow-lg shadow-transparent
+                         transform transition-all duration-300
+                         group-hover:scale-105 group-hover:shadow-xl group-hover:shadow-black" 
+              onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/128x128?text=Logo"; }}
+            />
+          </div>
         </div>
 
       </div>
@@ -80,18 +91,24 @@ const Footer = ({ onOpenPowaContactForm, onOpenAdminLogin, userProfile }) => {
 
       {/* Agencia Digital Powa - Sutil y con descripción al pasar el mouse */}
       <div className="text-center mt-4 text-xs text-gray-600 dark:text-gray-700">
-        {/* Este div es el 'group' que al hacer hover revelará el párrafo */}
         <a 
-          href="https://agenciadigitalpowa.web.app/" // Reemplaza con la URL real de la agencia
+          href="https://agenciadigitalpowa.web.app/"
           target="_blank" 
           rel="noopener noreferrer" 
           className="group inline-block cursor-pointer hover:text-gray-400 dark:hover:text-gray-500 transition-colors duration-200"
         >
-          <div className="flex items-center justify-center"> {/* Contenedor para el icono y texto principal */}
-            <Code size={14} className="mr-1" /> {/* Icono pequeño y sutil */}
-            <span>Desarrollo Agencia Digital Powa</span> {/* Texto de la agencia */}
+          <div className="flex items-center justify-center
+                      p-2 rounded-md border border-transparent shadow-md shadow-transparent
+                      transition-all duration-300
+                      group-hover:border-white group-hover:shadow-lg group-hover:shadow-purple-500 group-hover:scale-105">
+            <img
+              src="/logopowa.svg" // <<<<<<<<<<<<< RECUERDA REEMPLAZAR ESTA RUTA CON LA DE TU ICONO
+              alt="Icono de Agencia Digital Powa"
+              className="w-4 h-4 mr-1 object-contain"
+              onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/16x16/ADADAD/FFFFFF?text=P"; }}
+            />
+            <span>Desarrollo Agencia Digital Powa</span>
           </div>
-          {/* El párrafo que aparece al pasar el mouse */}
           <p className="text-xs text-gray-500 dark:text-gray-600 mt-1
                         opacity-0 invisible transition-all duration-300 ease-in-out
                         group-hover:opacity-100 group-hover:visible group-hover:translate-y-0
