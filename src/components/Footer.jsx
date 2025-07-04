@@ -66,17 +66,15 @@ const Footer = ({ onOpenPowaContactForm, onOpenAdminLogin, userProfile }) => {
           </ul>
         </div>
 
-        {/* Sección 4: Contenido Adicional (Aquí agregamos la imagen del logo con redondeo perfecto) */}
+        {/* Sección 4: Contenido Adicional (Aquí agregamos la imagen del logo con estilo permanente) */}
         <div className="text-center md:text-left">
-          <h4 className="text-xl font-semibold text-white dark:text-gray-100 mb-4">¡Síguenos!</h4>
-          <div className="flex justify-center md:justify-start group"> {/* Añadimos 'group' aquí para el hover */}
+          <div className="flex justify-center md:justify-start">
             <img
               src="/capriccio-redondo.png" // Asegúrate de que esta ruta sea correcta
               alt="Logo de Capriccio de Pizza"
               className="w-32 h-32 object-cover rounded-full
-                         border-2 border-white shadow-lg shadow-transparent
-                         transform transition-all duration-300
-                         group-hover:scale-105 group-hover:shadow-xl group-hover:shadow-black" 
+                         border-2 border-white shadow-xl shadow-black
+                         transform scale-105" 
               onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/128x128?text=Logo"; }}
             />
           </div>
@@ -95,24 +93,25 @@ const Footer = ({ onOpenPowaContactForm, onOpenAdminLogin, userProfile }) => {
           href="https://agenciadigitalpowa.web.app/"
           target="_blank" 
           rel="noopener noreferrer" 
-          className="group inline-block cursor-pointer hover:text-gray-400 dark:hover:text-gray-500 transition-colors duration-200"
+          className="group inline-block cursor-pointer text-gray-600 dark:text-gray-700 rounded-md focus:outline-none" // Mantenemos el focus:outline-none para accesibilidad
+          tabIndex="0" // Reintroducimos tabIndex para que sea enfocable
         >
           <div className="flex items-center justify-center
-                      p-2 rounded-md border border-transparent shadow-md shadow-transparent
-                      transition-all duration-300
-                      group-hover:border-white group-hover:shadow-lg group-hover:shadow-purple-500 group-hover:scale-105">
+                      p-2 rounded-md border border-white shadow-lg shadow-purple-500 scale-105"> {/* Estilos permanentes en el div */}
             <img
-              src="/logopowa.svg" // <<<<<<<<<<<<< RECUERDA REEMPLAZAR ESTA RUTA CON LA DE TU ICONO
+              src="/logopowa.svg" // Asegúrate de que esta ruta sea correcta
               alt="Icono de Agencia Digital Powa"
-              className="w-4 h-4 mr-1 object-contain"
+              className="w-4 h-4 mr-1 object-contain transition-colors duration-200
+                         group-hover:text-purple-400 group-active:text-purple-400" // Icono también cambia de color
               onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/16x16/ADADAD/FFFFFF?text=P"; }}
             />
-            <span>Desarrollo Agencia Digital Powa</span>
+            <span className="transition-colors duration-200
+                             group-hover:text-purple-400 group-active:text-purple-400"> {/* <<<<<<<<<<<<<<< CLASES AÑADIDAS AQUÍ */}
+              Desarrollo Agencia Digital Powa
+            </span>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-600 mt-1
-                        opacity-0 invisible transition-all duration-300 ease-in-out
-                        group-hover:opacity-100 group-hover:visible group-hover:translate-y-0
-                        -translate-y-2">
+          {/* El párrafo ahora es siempre visible por defecto */}
+          <p className="text-xs text-gray-500 dark:text-gray-600 mt-1">
             Tu socio estratégico en desarrollo web y móvil.
           </p>
         </a>
